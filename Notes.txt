@@ -1,0 +1,18 @@
+Header:
+Bootstrap Color Density -> 3 bits
+Calibration Colors -> Color density - 2 bytes
+Version -> 5 bits
+Model -> 3 bits 
+    000	25×25
+    001	49×49
+    010	81×81
+    011	177×177
+    100 Custom
+    if model == 100:
+        Width -> 12 bits
+        Height -> 12 bits
+Mode -> 4 bits
+Compression -> 3 bits
+Error Correction -> 2 bits
+Payload Length -> 16 bits
+Header Check Sum -> 16 bits
