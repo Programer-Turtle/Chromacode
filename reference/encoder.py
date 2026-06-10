@@ -24,11 +24,12 @@ COLOR_MAP = {
     7: "magenta"
 }
 
-MODES = {
-    1: {"width":25, "height":25, "binary": "000"},
-    2: {"width":49, "height":49, "binary": "001"},
-    3: {"width":81, "height":81, "binary": "010"},
-    4: {"width":177, "height":177, "binary": "011"}
+MODELS = {
+    1: "000",
+    2: "001",
+    3: "010",
+    4: "011",
+    5: "100"
 }
 
 ECS = {
@@ -38,30 +39,84 @@ ECS = {
     "H":"11"
 }
 
+MODES = {
+    "UTF-8":"0000"
+}
+
 def text_to_binary(text):
     return ''.join(format(byte, '08b') for byte in text.encode('utf-8'))
 
-def main(data, color_density, model, mode, ec):
+def main(data, color_density, model, mode, compression = "None", ec = "L", width = 0, height = 0):
     #Stores colors of each cell after encoding
-    block_colors = []
+    cells = []
     
     #Calculates the number of bits each cell can encode, verifys within range, and creates bootstrap header
     bit_cluster_length = math.ceil(math.log2(color_density))
     if bit_cluster_length > 8 or bit_cluster_length < 1:
-        raise Exception("The color density header is only 3 bits. Maximum color denisty of 256 and minimum of 2.")
-    block_colors.extend(BOOTSTRAP_COLOR_MAP[format(bit_cluster_length - 1, "03b")])
+        raise ValueError("The color density header is only 3 bits. Maximum color denisty of 256 and minimum of 2.")
+    cells.extend(BOOTSTRAP_COLOR_MAP[format(bit_cluster_length - 1, "03b")])
+    
+    #Calibration Colors
+    cells.extend(list(COLOR_MAP.values())[2:])
+
+    #Attaches Header Data
+    #Version 5
+    if VERSION < 0 or VERSION > 31:
+        raise ValueError("Version number can only be between 0 and 31")
+    
+    binary = format(VERSION, "05b")
+
+    #Model 3 
+    if model not in MODELS:
+        raise ValueError("Invalid Model")
+    
+    binary += MODELS[model]
+
+    #Model Custom 12
+    if model == 5:
+        if width < 0 or width > 4095:
+            raise ValueError("Width can only be between 0 and 4095")
+    
+        binary += format(width, "012b")
+
+        if height < 0 or height > 4095:
+            raise ValueError("Height can only be between 0 and 4095")
+    
+        binary += format(height, "012b")
+
+    #Mode 4
+    binary += MODES[mode]
+
+    #Compression 3 Not supported yet
+    binary += "000"
+
+    #EC 2
+    binary += ECS[ec]
     
     #Encodes binary based on mode
     match mode:
-        case "text":
-            binary = text_to_binary(data)
+        case "UTF-8":
+            payload_binary = text_to_binary(data)
+        case _:
+            raise ValueError("Unsupported mode")
 
+    #Payload Length
+    if len(payload_binary) > 1048575:
+        raise ValueError("Payload too large")
+    
+    binary += format(len(payload_binary), "020b")
+    
+    #Checksum 16
+    checksum = int(binary, 2) % 65536
+    binary += format(checksum, "016b")
+    
+    binary += payload_binary
     binary += "0" * (-len(binary) % bit_cluster_length)
 
     for bit_index in range(0, len(binary), bit_cluster_length):
-        block_colors.append(COLOR_MAP[int(binary[bit_index:bit_index+bit_cluster_length], 2)])
+        cells.append(COLOR_MAP[int(binary[bit_index:bit_index+bit_cluster_length], 2)])
 
-    print(block_colors)
+    print(cells)
 
 if __name__ == "__main__":
-    main("Hello World", color_density=8, model=1, mode="text", ec="L")
+    main("Hello World", color_density=8, model=1, mode="UTF-8", ec="L")
