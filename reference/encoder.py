@@ -117,6 +117,9 @@ def main(data, color_density, model, mode, compression = "None", ec = "L", width
         cells.append(COLOR_MAP[int(binary[bit_index:bit_index+bit_cluster_length], 2)])
 
     print(cells)
+    print(len(cells))
 
 if __name__ == "__main__":
-    main("Hello World", color_density=8, model=1, mode="UTF-8", ec="L")
+    with open("draw.html", "r", encoding="utf-8") as file:
+        data = file.read()
+    main(data, color_density=8, model=1, mode="UTF-8", ec="L")

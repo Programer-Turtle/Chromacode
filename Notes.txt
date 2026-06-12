@@ -14,7 +14,7 @@ Model -> 3 bits
 Mode -> 4 bits
 Compression -> 3 bits
 Error Correction -> 2 bits
-Payload Length -> 16 bits
+Payload Length -> 20 bits
 Header Check Sum -> 16 bits
 
 Roadmap
@@ -27,6 +27,8 @@ Read Me
 
 v0.2
 decoder
+Roadmap MD
+Begin Specification
 
 v0.3
 image generation
@@ -45,7 +47,6 @@ Compression
 
 v0.6
 Website
-Schematics
 
 v0.7
 Binary Mode
