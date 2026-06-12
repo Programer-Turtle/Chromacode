@@ -1,0 +1,63 @@
+Header:
+Bootstrap Color Density -> 3 bits
+Calibration Colors -> Color density - 2 bytes
+Version -> 5 bits
+Model -> 3 bits 
+    000	25×25
+    001	49×49
+    010	81×81
+    011	177×177
+    100 Custom
+    if model == 100:
+        Width -> 12 bits
+        Height -> 12 bits
+Mode -> 4 bits
+Compression -> 3 bits
+Error Correction -> 2 bits
+Payload Length -> 20 bits
+Header Check Sum -> 16 bits
+
+Roadmap
+
+v0.1
+Header System
+UTF-8 Support
+Encoder
+Read Me
+
+v0.2
+decoder
+Roadmap MD
+Begin Specification
+
+v0.3
+image generation
+all colors varieties
+size machanic
+
+v0.4
+scanner
+posistion
+rotation
+skew
+
+v0.5
+error correction
+Compression
+
+v0.6
+Website
+
+v0.7
+Binary Mode
+HTML Mode
+
+v0.8
+Script Mode
+
+v0.9
+Image mode
+
+v1
+Final stablization
+Benchmarking compared to qr code
