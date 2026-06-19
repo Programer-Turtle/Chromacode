@@ -24,14 +24,6 @@ COLOR_MAP = {
     7: "magenta"
 }
 
-MODELS = {
-    1: "000",
-    2: "001",
-    3: "010",
-    4: "011",
-    5: "100"
-}
-
 ECS = {
     "L":"00",
     "M":"01",
@@ -65,24 +57,6 @@ def main(data, color_density, model, mode, compression = "None", ec = "L", width
         raise ValueError("Version number can only be between 0 and 31")
     
     binary = format(VERSION, "05b")
-
-    #Model 3 
-    if model not in MODELS:
-        raise ValueError("Invalid Model")
-    
-    binary += MODELS[model]
-
-    #Model Custom 12
-    if model == 5:
-        if width < 0 or width > 4095:
-            raise ValueError("Width can only be between 0 and 4095")
-    
-        binary += format(width, "012b")
-
-        if height < 0 or height > 4095:
-            raise ValueError("Height can only be between 0 and 4095")
-    
-        binary += format(height, "012b")
 
     #Mode 4
     binary += MODES[mode]
@@ -120,6 +94,4 @@ def main(data, color_density, model, mode, compression = "None", ec = "L", width
     print(len(cells))
 
 if __name__ == "__main__":
-    with open("draw.html", "r", encoding="utf-8") as file:
-        data = file.read()
-    main(data, color_density=8, model=1, mode="UTF-8", ec="L")
+    main("Hello World. I love this place it's awesome.", color_density=8, model=1, mode="UTF-8", ec="L")
