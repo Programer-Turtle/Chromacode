@@ -1,6 +1,6 @@
 # Chromacode
 
-![Version](https://img.shields.io/badge/version-0.1-blue)
+![Version](https://img.shields.io/badge/version-0.2-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
 
 Chromacode is a high-density multicolor barcode format designed to hold more data than traditional QR codes.
