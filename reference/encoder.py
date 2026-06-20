@@ -1,3 +1,4 @@
+import hashlib
 import math
 
 VERSION = 0
@@ -24,16 +25,22 @@ COLOR_MAP = {
     7: "magenta"
 }
 
-ECS = {
+ERROR_CORRECTION_MAP = {
     "L":"00",
     "M":"01",
     "Q":"10",
     "H":"11"
 }
 
-MODES = {
+MODE_MAP = {
     "UTF-8":"0000"
 }
+
+def checksum16_binary(binary_string: bytes):
+    value = int(binary_string, 2)
+    data = value.to_bytes((len(binary_string) + 7) // 8, byteorder="big")
+    checksum = sum(data) & 0xFFFF
+    return format(checksum, "016b")
 
 def text_to_binary(text):
     return ''.join(format(byte, '08b') for byte in text.encode('utf-8'))
@@ -49,49 +56,51 @@ def main(data, color_density, model, mode, compression = "None", ec = "L", width
     cells.extend(BOOTSTRAP_COLOR_MAP[format(bit_cluster_length - 1, "03b")])
     
     #Calibration Colors
-    cells.extend(list(COLOR_MAP.values())[2:])
+    cells.extend(list(COLOR_MAP.values())[2:color_density])
 
-    #Attaches Header Data
-    #Version 5
+    #Version Header
     if VERSION < 0 or VERSION > 31:
         raise ValueError("Version number can only be between 0 and 31")
     
     binary = format(VERSION, "05b")
 
-    #Mode 4
-    binary += MODES[mode]
+    #Mode Header
+    binary += MODE_MAP[mode]
 
-    #Compression 3 Not supported yet
+    #Compression Header (Yet To Impletment)
     binary += "000"
 
-    #EC 2
-    binary += ECS[ec]
+    #Error Correction Header
+    binary += ERROR_CORRECTION_MAP[ec]
     
-    #Encodes binary based on mode
+    #Encodes Payload
     match mode:
         case "UTF-8":
             payload_binary = text_to_binary(data)
         case _:
             raise ValueError("Unsupported mode")
 
-    #Payload Length
+    #Payload Length Test
     if len(payload_binary) > 1048575:
         raise ValueError("Payload too large")
     
+    #Payload Length Header
     binary += format(len(payload_binary), "020b")
     
-    #Checksum 16
-    checksum = int(binary, 2) % 65536
-    binary += format(checksum, "016b")
+    #Checksum Header
+    binary += checksum16_binary(payload_binary)
     
+    #Add paylaod and Padd
     binary += payload_binary
     binary += "0" * (-len(binary) % bit_cluster_length)
 
+    #Convert
     for bit_index in range(0, len(binary), bit_cluster_length):
         cells.append(COLOR_MAP[int(binary[bit_index:bit_index+bit_cluster_length], 2)])
 
     print(cells)
     print(len(cells))
+    return cells
 
 if __name__ == "__main__":
-    main("Hello World. I love this place it's awesome.", color_density=8, model=1, mode="UTF-8", ec="L")
+    main("How are you doing? I'm doing pretty good!", color_density=8, model=1, mode="UTF-8", ec="L")
