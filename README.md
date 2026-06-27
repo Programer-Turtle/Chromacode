@@ -30,7 +30,7 @@ This repository contains the official specification for Chromacode. The project 
 ### 0.2
 
 - [x] Decoder
-- [ ] Roadmap
+- [x] Roadmap
 - [ ] Begin Specification
 
 ### 0.3
